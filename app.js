@@ -1,4 +1,4 @@
-// Variablen zur Speicherung von Wörtern und dem Schwierigkeitsgrad
+// Variablen zur Speicherung von Wörtern und Schwierigkeitsstufe
 let words = [];
 let currentLevel = "Einfach"; // Standard-Schwierigkeitsgrad
 
@@ -8,9 +8,10 @@ const feedback = document.getElementById("feedback");
 const newWordButton = document.getElementById("new-word-button");
 const readWordButton = document.getElementById("read-word-button");
 const displayDurationSelect = document.getElementById("display-duration");
-const levelSelect = document.createElement("select"); // Dropdown für Schwierigkeitsstufen
 
-// Schwierigkeitsstufen-Dropdown erstellen
+// Dropdown für Schwierigkeitsstufen erstellen
+const levelSelect = document.createElement("select");
+levelSelect.id = "level-select"; // ID für Styling oder Debugging
 ["Einfach", "Mittel", "Schwer"].forEach(level => {
   const option = document.createElement("option");
   option.value = level;
@@ -22,9 +23,16 @@ document.body.insertBefore(levelSelect, newWordButton); // Dropdown oberhalb des
 // Funktion: Wörter aus JSON-Datei laden
 function loadWords() {
   fetch("./words.json")
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Fehler beim Laden der Wörter.");
+      }
+      return response.json();
+    })
     .then(data => {
       words = data.words;
+      feedback.textContent = "Wörter erfolgreich geladen.";
+      feedback.style.color = "green";
     })
     .catch(error => {
       feedback.textContent = "Fehler beim Laden der Wörter.";
@@ -37,7 +45,7 @@ function loadWords() {
 function displayNewWord() {
   const filteredWords = words.filter(word => word.level === currentLevel);
   if (filteredWords.length === 0) {
-    wordDisplay.textContent = "Keine Wörter gefunden.";
+    wordDisplay.textContent = "Keine Wörter für diese Schwierigkeitsstufe gefunden.";
     return;
   }
 
@@ -64,7 +72,6 @@ levelSelect.addEventListener("change", (event) => {
 
 // Buttons mit Funktionen verknüpfen
 newWordButton.addEventListener("click", displayNewWord);
-readWordButton.addEventListener("click", startRecognition);
 
 // Wörter beim Start laden
 loadWords();
