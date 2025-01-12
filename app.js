@@ -1,6 +1,6 @@
-// Liste von Wörtern
-const words = ["Apfel", "Baum", "Haus", "Katze", "Hund", "Auto", "Buch"];
-let currentWord = "";
+// Variablen zur Speicherung von Wörtern und dem Schwierigkeitsgrad
+let words = [];
+let currentLevel = "Einfach"; // Standard-Schwierigkeitsgrad
 
 // Elemente aus dem DOM
 const wordDisplay = document.getElementById("word-display");
@@ -8,18 +8,41 @@ const feedback = document.getElementById("feedback");
 const newWordButton = document.getElementById("new-word-button");
 const readWordButton = document.getElementById("read-word-button");
 const displayDurationSelect = document.getElementById("display-duration");
+const levelSelect = document.createElement("select"); // Dropdown für Schwierigkeitsstufen
 
-// Web Speech API: Spracherkennung einrichten
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.lang = "de-DE";
-recognition.interimResults = false; // Nur endgültige Ergebnisse
-recognition.continuous = true; // Kontinuierlicher Modus
-let recognizedText = ""; // Speichert das zuletzt erkannte Wort
+// Schwierigkeitsstufen-Dropdown erstellen
+["Einfach", "Mittel", "Schwer"].forEach(level => {
+  const option = document.createElement("option");
+  option.value = level;
+  option.textContent = level;
+  levelSelect.appendChild(option);
+});
+document.body.insertBefore(levelSelect, newWordButton); // Dropdown oberhalb des Buttons einfügen
 
-// Funktion: Neues Wort anzeigen
+// Funktion: Wörter aus JSON-Datei laden
+function loadWords() {
+  fetch("./words.json")
+    .then(response => response.json())
+    .then(data => {
+      words = data.words;
+    })
+    .catch(error => {
+      feedback.textContent = "Fehler beim Laden der Wörter.";
+      feedback.style.color = "red";
+      console.error("JSON-Fehler:", error);
+    });
+}
+
+// Funktion: Neues Wort anzeigen (nach Schwierigkeitsgrad filtern)
 function displayNewWord() {
-  currentWord = words[Math.floor(Math.random() * words.length)];
-  wordDisplay.textContent = currentWord;
+  const filteredWords = words.filter(word => word.level === currentLevel);
+  if (filteredWords.length === 0) {
+    wordDisplay.textContent = "Keine Wörter gefunden.";
+    return;
+  }
+
+  const randomWord = filteredWords[Math.floor(Math.random() * filteredWords.length)];
+  wordDisplay.textContent = randomWord.text;
 
   // Dauer aus Dropdown auswählen
   const displayDuration = parseFloat(displayDurationSelect.value) * 1000;
@@ -32,37 +55,16 @@ function displayNewWord() {
   feedback.textContent = ""; // Feedback zurücksetzen
 }
 
-// Funktion: Ergebnis prüfen, wenn "Lesen" geklickt wird
-function checkRecognition() {
-  if (!recognizedText) {
-    feedback.textContent = "Ich habe nichts erkannt. Bitte sprich ins Mikrofon.";
-    feedback.style.color = "red";
-    return;
-  }
-
-  if (recognizedText.toLowerCase() === currentWord.toLowerCase()) {
-    feedback.textContent = "Richtig gelesen! 🎉";
-    feedback.style.color = "green";
-  } else {
-    feedback.textContent = `Falsch. Du hast gesagt: "${recognizedText}"`;
-    feedback.style.color = "red";
-  }
-}
-
-// Ereignis: Spracherkennungsergebnisse speichern
-recognition.onresult = (event) => {
-  recognizedText = event.results[event.results.length - 1][0].transcript.trim();
-};
-
-// Fehlerbehandlung
-recognition.onerror = (event) => {
-  feedback.textContent = "Es gab ein Problem bei der Spracherkennung.";
-  feedback.style.color = "red";
-};
-
-// Starte die Spracherkennung kontinuierlich beim Laden der Seite
-recognition.start();
+// Funktion: Schwierigkeitsgrad ändern
+levelSelect.addEventListener("change", (event) => {
+  currentLevel = event.target.value;
+  feedback.textContent = `Schwierigkeitsgrad geändert zu: ${currentLevel}`;
+  feedback.style.color = "black";
+});
 
 // Buttons mit Funktionen verknüpfen
 newWordButton.addEventListener("click", displayNewWord);
-readWordButton.addEventListener("click", checkRecognition);
+readWordButton.addEventListener("click", startRecognition);
+
+// Wörter beim Start laden
+loadWords();
