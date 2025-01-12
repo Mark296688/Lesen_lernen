@@ -13,7 +13,8 @@ const displayDurationSelect = document.getElementById("display-duration");
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 recognition.lang = "de-DE";
 recognition.interimResults = false; // Nur endgültige Ergebnisse
-let permissionGranted = false; // Status, ob Berechtigung erteilt wurde
+recognition.continuous = true; // Kontinuierlicher Modus
+let recognizedText = ""; // Speichert das zuletzt erkannte Wort
 
 // Funktion: Neues Wort anzeigen
 function displayNewWord() {
@@ -31,32 +32,26 @@ function displayNewWord() {
   feedback.textContent = ""; // Feedback zurücksetzen
 }
 
-// Funktion: Spracherkennung starten
-function startRecognition() {
-  if (!permissionGranted) {
-    // Berechtigung sicherstellen, falls noch nicht erteilt
-    recognition.start();
-    recognition.stop();
-    permissionGranted = true;
+// Funktion: Ergebnis prüfen, wenn "Lesen" geklickt wird
+function checkRecognition() {
+  if (!recognizedText) {
+    feedback.textContent = "Ich habe nichts erkannt. Bitte sprich ins Mikrofon.";
+    feedback.style.color = "red";
+    return;
   }
 
-  // Starte die Spracherkennung
-  recognition.start();
-  feedback.textContent = "Lies das Wort vor!";
-  feedback.style.color = "black";
-}
-
-// Ereignis: Ergebnis der Spracherkennung verarbeiten
-recognition.onresult = (event) => {
-  const gesprochenesWort = event.results[0][0].transcript.trim();
-
-  if (gesprochenesWort.toLowerCase() === currentWord.toLowerCase()) {
+  if (recognizedText.toLowerCase() === currentWord.toLowerCase()) {
     feedback.textContent = "Richtig gelesen! 🎉";
     feedback.style.color = "green";
   } else {
-    feedback.textContent = `Falsch. Du hast gesagt: "${gesprochenesWort}"`;
+    feedback.textContent = `Falsch. Du hast gesagt: "${recognizedText}"`;
     feedback.style.color = "red";
   }
+}
+
+// Ereignis: Spracherkennungsergebnisse speichern
+recognition.onresult = (event) => {
+  recognizedText = event.results[event.results.length - 1][0].transcript.trim();
 };
 
 // Fehlerbehandlung
@@ -65,10 +60,9 @@ recognition.onerror = (event) => {
   feedback.style.color = "red";
 };
 
+// Starte die Spracherkennung kontinuierlich beim Laden der Seite
+recognition.start();
+
 // Buttons mit Funktionen verknüpfen
 newWordButton.addEventListener("click", displayNewWord);
-readWordButton.addEventListener("click", startRecognition);
-
-// Berechtigung einmalig beim Laden der Seite anfragen
-recognition.start();
-recognition.stop();
+readWordButton.addEventListener("click", checkRecognition);
