@@ -6,15 +6,14 @@ let currentWord = "";
 const wordDisplay = document.getElementById("word-display");
 const feedback = document.getElementById("feedback");
 const newWordButton = document.getElementById("new-word-button");
+const readWordButton = document.getElementById("read-word-button");
 const displayDurationSelect = document.getElementById("display-duration");
 
 // Web Speech API: Spracherkennung einrichten
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 recognition.lang = "de-DE";
-recognition.interimResults = false;
-recognition.continuous = true; // Kontinuierliche Erkennung aktivieren
-
-let recognitionActive = false; // Status der Spracherkennung
+recognition.interimResults = false; // Nur endgültige Ergebnisse
+let permissionGranted = false; // Status, ob Berechtigung erteilt wurde
 
 // Funktion: Neues Wort anzeigen
 function displayNewWord() {
@@ -32,17 +31,18 @@ function displayNewWord() {
   feedback.textContent = ""; // Feedback zurücksetzen
 }
 
-// Spracherkennung starten (falls noch nicht aktiv)
+// Funktion: Spracherkennung starten
 function startRecognition() {
-  if (recognitionActive) {
-    feedback.textContent = "Spracherkennung läuft bereits.";
-    feedback.style.color = "blue";
-    return;
+  if (!permissionGranted) {
+    // Berechtigung sicherstellen, falls noch nicht erteilt
+    recognition.start();
+    recognition.stop();
+    permissionGranted = true;
   }
 
-  recognitionActive = true;
+  // Starte die Spracherkennung
   recognition.start();
-  feedback.textContent = "Spracherkennung gestartet. Lies das Wort vor!";
+  feedback.textContent = "Lies das Wort vor!";
   feedback.style.color = "black";
 }
 
@@ -59,20 +59,16 @@ recognition.onresult = (event) => {
   }
 };
 
-// Ereignis: Spracherkennung läuft weiter
-recognition.onend = () => {
-  if (recognitionActive) {
-    recognition.start(); // Spracherkennung automatisch neu starten
-  }
-};
-
 // Fehlerbehandlung
 recognition.onerror = (event) => {
   feedback.textContent = "Es gab ein Problem bei der Spracherkennung.";
   feedback.style.color = "red";
-  recognitionActive = false; // Bei schwerwiegenden Fehlern stoppen
 };
 
 // Buttons mit Funktionen verknüpfen
 newWordButton.addEventListener("click", displayNewWord);
-startRecognition(); // Spracherkennung direkt beim Laden der Seite starten
+readWordButton.addEventListener("click", startRecognition);
+
+// Berechtigung einmalig beim Laden der Seite anfragen
+recognition.start();
+recognition.stop();
