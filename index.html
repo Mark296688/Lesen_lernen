@@ -4,15 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
   <title>Lesen Trainieren</title>
 </head>
 <body>
   <div class="app-container">
     <h1>Lesen Trainieren</h1>
     <div id="word-display" class="word-display">Start</div>
-    
-    <!-- Auswahl für die Einblenddauer -->
+    <button id="new-word-button">Neues Wort</button>
+    <button id="read-word-button">Lesen</button>
     <div>
       <label for="display-duration">Einblenddauer (Sekunden):</label>
       <select id="display-duration">
@@ -26,9 +25,6 @@
         <option value="4">4</option>
       </select>
     </div>
-    
-    <button id="new-word-button">Neues Wort</button>
-    <button id="read-word-button">Lesen</button>
     <div id="feedback"></div>
   </div>
   <script src="app.js"></script>
