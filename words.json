@@ -1,0 +1,10 @@
+{
+  "words": [
+    { "text": "Apfel", "level": "Einfach" },
+    { "text": "Baum", "level": "Einfach" },
+    { "text": "Haus", "level": "Mittel" },
+    { "text": "Katze", "level": "Mittel" },
+    { "text": "Automobil", "level": "Schwer" },
+    { "text": "Philosophie", "level": "Schwer" }
+  ]
+}
