@@ -1,6 +1,5 @@
 {
   "words": [
-    // Einfache Wörter
     { "text": "Apfel", "level": "Einfach" },
     { "text": "Baum", "level": "Einfach" },
     { "text": "Haus", "level": "Einfach" },
