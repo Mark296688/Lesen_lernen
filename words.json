@@ -93,7 +93,7 @@
     { "text": "Wolf", "level": "Einfach" },
     { "text": "Tiger", "level": "Einfach" },
     { "text": "Löwe", "level": "Einfach" },
-    { "text": "Elefant", "level": "Einfach" }
+    { "text": "Elefant", "level": "Einfach" },
     { "text": "Schule", "level": "Mittel" },
     { "text": "Lehrer", "level": "Mittel" },
     { "text": "Fahrrad", "level": "Mittel" },
@@ -177,7 +177,7 @@
     { "text": "Wellenrauschen", "level": "Mittel" },
     { "text": "Muschelsucher", "level": "Mittel" },
     { "text": "Sonnencreme", "level": "Mittel" },
-    { "text": "Strandkorb", "level": "Mittel" }
+    { "text": "Strandkorb", "level": "Mittel" },
     { "text": "Philosophie", "level": "Schwer" },
     { "text": "Astronomie", "level": "Schwer" },
     { "text": "Meteorologie", "level": "Schwer" },
